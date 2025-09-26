@@ -5,7 +5,8 @@ node_modules/
 # Build outputs
 dist/
 build/
-# releases/  # Comentado temporalmente para primer release
+releases/*
+!releases/README.md
 *.exe
 *.dll
 *.so
