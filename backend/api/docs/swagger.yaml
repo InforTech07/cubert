@@ -1,0 +1,356 @@
+openapi: "3.0.0"
+info:
+  title: "Cubert Filesystem API"
+  description: "Local filesystem exploration and management API"
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+paths:
+  /health:
+    get:
+      tags:
+        - "Health"
+      summary: "Health check"
+      description: "Returns the health status of the API"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  service:
+                    type: string
+                    example: "cubert-filesystem-api"
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+  /api:
+    get:
+      tags:
+        - "Info"
+      summary: "API information"
+      description: "Returns API information and available endpoints"
+      responses:
+        "200":
+          description: "Success"
+
+  /api/v1/filesystem/list:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "List directory contents"
+      description: "Returns the contents of a directory"
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Directory path to list"
+          example: "/home/user"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  files:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocalFile'
+                  count:
+                    type: integer
+        "400":
+          description: "Bad request"
+        "500":
+          description: "Internal server error"
+
+  /api/v1/filesystem/scan:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "Scan directory recursively"
+      description: "Scans a directory recursively and returns detailed information"
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Directory path to scan"
+          example: "/home/user"
+        - name: max_depth
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: "Maximum depth to scan"
+        - name: skip_hidden
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: "Skip hidden files and directories"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResult'
+
+  /api/v1/filesystem/info:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "Get file information"
+      description: "Returns detailed information about a file or directory"
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "File or directory path"
+          example: "/home/user/document.pdf"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileInfo'
+        "404":
+          description: "File not found"
+
+  /api/v1/filesystem/stats:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "Get directory statistics"
+      description: "Returns statistics about a directory"
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Directory path"
+          example: "/home/user"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectoryStats'
+
+  /api/v1/filesystem/search:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "Search files"
+      description: "Search for files by name pattern"
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Directory path to search in"
+          example: "/home/user"
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Search query"
+          example: "document"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  query:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocalFile'
+                  count:
+                    type: integer
+
+  /api/v1/filesystem/roots:
+    get:
+      tags:
+        - "Filesystem"
+      summary: "Get system roots"
+      description: "Returns available system root directories"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roots:
+                    type: array
+                    items:
+                      type: string
+                  count:
+                    type: integer
+
+  /api/v1/filesystem/validate:
+    post:
+      tags:
+        - "Filesystem"
+      summary: "Validate path"
+      description: "Validates if a path exists and is accessible"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/home/user"
+      responses:
+        "200":
+          description: "Valid path"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  valid:
+                    type: boolean
+        "400":
+          description: "Invalid path"
+
+components:
+  schemas:
+    LocalFile:
+      type: object
+      properties:
+        path:
+          type: string
+        name:
+          type: string
+        size:
+          type: integer
+          format: int64
+        mod_time:
+          type: string
+          format: date-time
+        is_directory:
+          type: boolean
+        content_type:
+          type: string
+        permissions:
+          type: string
+
+    ScanResult:
+      type: object
+      properties:
+        path:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocalFile'
+        directories:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocalFile'
+        total_files:
+          type: integer
+        total_size:
+          type: integer
+          format: int64
+        scan_time:
+          type: string
+          format: date-time
+        error_count:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+
+    FileInfo:
+      type: object
+      properties:
+        path:
+          type: string
+        name:
+          type: string
+        size:
+          type: integer
+          format: int64
+        mod_time:
+          type: string
+          format: date-time
+        is_directory:
+          type: boolean
+        content_type:
+          type: string
+        permissions:
+          type: string
+        extension:
+          type: string
+        parent:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+    DirectoryStats:
+      type: object
+      properties:
+        path:
+          type: string
+        total_files:
+          type: integer
+          format: int64
+        total_directories:
+          type: integer
+          format: int64
+        total_size:
+          type: integer
+          format: int64
+        last_modified:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
