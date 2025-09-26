@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* Variables del sistema futurista inspirado en Passengers */
+:root {
+  /* Colores base elegantes */
+  --futuristic-bg: rgb(5, 8, 15);
+  --futuristic-surface: rgba(15, 20, 30, 0.3);
+  --futuristic-surface-light: rgba(25, 35, 50, 0.2);
+  --futuristic-glass: rgba(255, 255, 255, 0.03);
+  --futuristic-glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Bordes elegantes sin neón */
+  --futuristic-border: rgba(200, 210, 225, 0.15);
+  --futuristic-border-hover: rgba(220, 230, 245, 0.25);
+  --futuristic-border-active: rgba(240, 245, 255, 0.35);
+  
+  /* Acentos sutiles */
+  --futuristic-accent: rgb(100, 120, 150);
+  --futuristic-accent-light: rgb(140, 160, 190);
+  --futuristic-text: rgb(220, 225, 235);
+  --futuristic-text-secondary: rgb(160, 170, 185);
+  --futuristic-text-muted: rgb(100, 110, 125);
+  
+  /* Sombras elegantes */
+  --futuristic-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --futuristic-shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.4);
+  --futuristic-inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+/* Clases utilitarias futuristas */
+.futuristic-glass {
+  background: var(--futuristic-glass);
+  border: 1px solid var(--futuristic-glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.futuristic-surface {
+  background: var(--futuristic-surface);
+  border: 1px solid var(--futuristic-border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.futuristic-border {
+  border: 1px solid var(--futuristic-border);
+  transition: border-color 0.3s ease;
+}
+
+.futuristic-border:hover {
+  border-color: var(--futuristic-border-hover);
+}
+
+.futuristic-border:focus,
+.futuristic-border:active {
+  border-color: var(--futuristic-border-active);
+  outline: none;
+}
+
+.futuristic-text {
+  color: var(--futuristic-text);
+}
+
+.futuristic-text-secondary {
+  color: var(--futuristic-text-secondary);
+}
+
+.futuristic-text-muted {
+  color: var(--futuristic-text-muted);
+}
+
+/* Efectos de bordes elegantes */
+.futuristic-highlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.futuristic-highlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(
+    135deg, 
+    transparent 0%, 
+    var(--futuristic-border-hover) 25%, 
+    var(--futuristic-border-active) 50%, 
+    var(--futuristic-border-hover) 75%, 
+    transparent 100%
+  );
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.futuristic-highlight:hover::before {
+  opacity: 1;
+}
+
+/* Patrón de fondo futurista sutil */
+.futuristic-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(100, 120, 150, 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(140, 160, 190, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 40px 40px, 60px 60px, 20px 20px, 20px 20px;
+}
+
+/* Animaciones sutiles */
+@keyframes futuristic-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.futuristic-pulse {
+  animation: futuristic-pulse 3s ease-in-out infinite;
+}
+
+/* Scrollbar futurista */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--futuristic-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--futuristic-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--futuristic-border-hover);
+}
+
+/* Selección de texto */
+::selection {
+  background: var(--futuristic-accent);
+  color: var(--futuristic-text);
+}
