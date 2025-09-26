@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +21,9 @@ import (
 	"github.com/infortech07/cubert/internal/filesystem/services"
 	"github.com/infortech07/cubert/internal/shared/utils"
 )
+
+//go:embed static
+var staticFiles embed.FS
 
 func main() {
 	// Cargar variables de entorno
@@ -86,6 +91,44 @@ func setupRouter(filesystemHandler *handlers.FilesystemHandler, port string) chi
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
 
+	// Configurar archivos estáticos embebidos
+	staticFS, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		log.Printf("Error setting up embedded static files: %v", err)
+		// Fallback a archivos del sistema si no hay embebidos
+		staticDir := "./static"
+		r.Route("/static", func(r chi.Router) {
+			fs := http.StripPrefix("/static", http.FileServer(http.Dir(staticDir)))
+			r.Handle("/*", fs)
+		})
+	} else {
+		// Servir archivos embebidos
+		r.Route("/static", func(r chi.Router) {
+			fs := http.StripPrefix("/static/", http.FileServer(http.FS(staticFS)))
+			r.Handle("/*", fs)
+		})
+	}
+
+	// Función helper para servir index.html embebido
+	serveIndex := func(w http.ResponseWriter, r *http.Request) {
+		data, err := staticFiles.ReadFile("static/index.html")
+		if err != nil {
+			// Fallback a archivo del sistema
+			http.ServeFile(w, r, "./static/index.html")
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write(data)
+	}
+
+	// Servir la aplicación React para todas las rutas del frontend
+	r.Get("/", serveIndex)
+	r.Get("/login", serveIndex)
+	r.Get("/files", serveIndex)
+	r.Get("/files/*", serveIndex)
+	r.Get("/dashboard", serveIndex)
+	r.Get("/dashboard/*", serveIndex)
+
 	// Health check
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		health := map[string]interface{}{
@@ -93,6 +136,7 @@ func setupRouter(filesystemHandler *handlers.FilesystemHandler, port string) chi
 			"service":   "cubert-filesystem-api",
 			"version":   "1.0.0",
 			"timestamp": time.Now(),
+			"embedded":  true, // Indicar que usa archivos embebidos
 		}
 		utils.WriteJSONResponse(w, http.StatusOK, health)
 	})
@@ -102,7 +146,8 @@ func setupRouter(filesystemHandler *handlers.FilesystemHandler, port string) chi
 		info := map[string]interface{}{
 			"name":        "Cubert Filesystem API",
 			"version":     "1.0.0",
-			"description": "Local filesystem exploration and management API",
+			"description": "Local filesystem exploration and management API with embedded frontend",
+			"embedded":    true,
 			"endpoints": map[string]string{
 				"scan":     "/api/v1/filesystem/scan?path=/your/path",
 				"list":     "/api/v1/filesystem/list?path=/your/path",

@@ -54,27 +54,137 @@ cubert/
 git clone <tu-repositorio>
 cd cubert
 
-# Instalar dependencias del frontend
-cd client
-pnpm install
+# Instalar todas las dependencias
+make install
 
-# Instalar dependencias del backend
-cd ../backend
-go mod download
+# O manualmente:
+cd client && pnpm install
+cd ../backend && go mod download
 ```
 
 ### Desarrollo Local
 
-#### Frontend
+#### Opción 1: Desarrollo Frontend Solo
 ```bash
-cd client
-pnpm dev
+make dev
+# o
+cd client && pnpm dev
 ```
 
-#### Backend
+#### Opción 2: Desarrollo Completo (Frontend + Backend)
 ```bash
-cd backend
-go run cmd/server/main.go
+make dev-full
+# Construye el frontend y ejecuta el backend
+```
+
+#### Opción 3: Ejecutar Backend Solo
+```bash
+make run-backend
+# o
+cd backend && go run cmd/server/main.go
+```
+
+### Producción
+
+#### Build Embebido (Recomendado)
+```bash
+# Binario con frontend embebido
+make build-embedded        # Build normal
+make build-embedded-compressed  # Build comprimido (requiere UPX)
+make run-embedded          # Build + ejecutar
+
+# Script directo
+./build.sh                 # Build embebido
+./build.sh --compress      # Build comprimido
+./build.sh --debug         # Build debug
+
+# Ejecutar binario embebido
+./releases/cubert-embedded
+```
+
+#### Build Tradicional
+```bash
+# Build con archivos estáticos separados
+make build    # Solo build
+make run      # Build + ejecutar
+make prod     # Build completo para producción
+```
+
+#### Docker
+```bash
+# Desarrollo
+docker-compose --profile dev up
+
+# Producción (binario embebido)
+docker-compose --profile prod up
+
+# Con Nginx
+docker-compose --profile prod-nginx up
+```
+
+#### URLs de la Aplicación
+- **🌐 Frontend**: `http://localhost:8080`
+- **🔗 API**: `http://localhost:8080/api`
+- **📚 Documentación**: `http://localhost:8080/docs`
+- **💊 Health Check**: `http://localhost:8080/health`
+
+### Comandos Disponibles
+
+```bash
+make help                    # Ver todos los comandos
+make install                 # Instalar dependencias
+make dev                     # Desarrollo frontend solo
+make dev-full               # Desarrollo completo
+make build                  # Build tradicional
+make build-embedded         # Build embebido (recomendado)
+make build-embedded-compressed  # Build embebido comprimido
+make run                    # Build tradicional + ejecutar
+make run-embedded           # Build embebido + ejecutar
+make clean                  # Limpiar builds y binarios
+make test                   # Ejecutar tests
+make info                   # Información del proyecto
+```
+
+## 🚀 **Deployment**
+
+### Opción 1: Binario Embebido (Recomendado)
+```bash
+# Construir
+make build-embedded
+
+# Copiar solo el binario al servidor
+scp releases/cubert-embedded user@server:/opt/cubert/
+
+# Ejecutar en el servidor
+./cubert-embedded
+ssh user@server '/opt/cubert/cubert-embedded'
+```
+
+### Opción 2: Docker
+```bash
+# Build imagen embebida
+docker build -f Dockerfile.embedded -t cubert:embedded .
+
+# Ejecutar
+docker run -p 8080:8080 cubert:embedded
+```
+
+### Opción 3: Systemd Service
+```ini
+[Unit]
+Description=Cubert File System
+After=network.target
+
+[Service]
+Type=simple
+User=cubert
+WorkingDirectory=/opt/cubert
+ExecStart=/opt/cubert/cubert-embedded
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 ## 📁 Módulos del Frontend

@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "rsbuild build",
+    "build:prod": "NODE_ENV=production rsbuild build",
     "dev": "rsbuild dev --open",
-    "preview": "rsbuild preview"
+    "preview": "rsbuild preview",
+    "build:backend": "pnpm build && echo '✅ Frontend build complete - files copied to ../backend/web/static'"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

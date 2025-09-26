@@ -17,6 +17,12 @@ export default defineConfig({
       '@/src': resolve(__dirname, './src'),
     },
   },
+  output: {
+    distPath: {
+      root: '../backend/cmd/server/static', // Build files will go to backend/cmd/server/static for embed
+    },
+    assetPrefix: '/static/', // Assets will be served from /static/ path
+  },
   tools: {
     postcss: {
       postcssOptions: {

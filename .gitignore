@@ -5,6 +5,7 @@ node_modules/
 # Build outputs
 dist/
 build/
+# releases/  # Comentado temporalmente para primer release
 *.exe
 *.dll
 *.so
@@ -71,6 +72,15 @@ Thumbs.db
 *.dll
 *.so
 *.dylib
+
+# Cubert binaries
+cubert
+cubert-embedded
+cubert.exe
+cubert-embedded.exe
+
+# Generated web assets (built from frontend)
+web/
 
 # Test binary, built with `go test -c`
 *.test

@@ -1,0 +1,69 @@
+# Multi-stage Dockerfile para Cubert con archivos embebidos
+
+# Etapa 1: Build del Frontend
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/client
+
+# Copiar archivos de dependencias
+COPY client/package.json client/pnpm-lock.yaml ./
+
+# Instalar pnpm y dependencias
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+# Copiar código fuente del frontend
+COPY client/ .
+
+# Build de producción
+RUN pnpm build
+
+# Etapa 2: Build del Backend con archivos embebidos
+FROM golang:1.21-alpine AS backend-builder
+
+# Instalar certificados SSL para HTTPS requests
+RUN apk --no-cache add ca-certificates git
+
+WORKDIR /app
+
+# Copiar archivos Go
+COPY backend/ .
+
+# Copiar archivos estáticos del frontend desde la etapa anterior
+COPY --from=frontend-builder /app/backend/web/static ./web/static
+
+# Descargar dependencias
+RUN go mod download
+
+# Verificar que los archivos estáticos existen
+RUN ls -la ./web/static/
+
+# Build del binario embebido con optimizaciones
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -a -installsuffix cgo \
+    -o cubert-embedded \
+    cmd/server/main.go
+
+# Etapa 3: Imagen final minimalista
+FROM scratch
+
+# Copiar certificados SSL
+COPY --from=backend-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Copiar solo el binario embebido
+COPY --from=backend-builder /app/cubert-embedded /cubert-embedded
+
+# Exponer puerto
+EXPOSE 8080
+
+# Variables de entorno
+ENV PORT=8080
+ENV NODE_ENV=production
+
+# Comando por defecto
+ENTRYPOINT ["/cubert-embedded"]
+
+# Metadata
+LABEL maintainer="Cubert Team"
+LABEL version="1.0.0"
+LABEL description="Cubert - Sistema de archivos futurista (binario embebido)"
