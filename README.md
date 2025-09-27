@@ -2,6 +2,12 @@
 
 Sistema de gestión de archivos con interfaz futurista inspirada en la película "Passengers", implementado con arquitectura hexagonal.
 
+## 📸 Vista Previa
+
+![Cubert - Vista Previa de la Aplicación](resource/img/cubert.png)
+
+*Interfaz principal de Cubert mostrando el explorador de archivos con diseño futurista*
+
 ## 🏗️ Estructura del Proyecto
 
 ```
@@ -27,6 +33,18 @@ cubert/
 - Efectos de cristal y transparencias elegantes
 - Bordes resaltados sin neón excesivo
 - Animaciones suaves y sofisticadas
+- TopBar unificado con breadcrumbs inteligentes
+- Explorador de archivos con cards de múltiples tamaños (small, medium, large)
+- Reproductor de música integrado en la barra superior
+- Menús desplegables con fondos semi-transparentes
+- Sistema de navegación con dock inferior animado
+
+### 🎵 **Características de la Interfaz**
+- **TopBar Dinámico**: Breadcrumbs con truncamiento automático, buscador centrado, controles de vista
+- **Explorador de Archivos**: Vista en grid responsiva con 3 tamaños de cards diferentes
+- **Reproductor Integrado**: Carga y reproduce música directamente desde la interfaz
+- **Navegación Fluida**: Transiciones suaves entre secciones y estados
+- **Responsive Design**: Adaptable a diferentes tamaños de pantalla
 
 ### 🏛️ **Arquitectura Hexagonal**
 - Separación clara de capas (Domain, Infrastructure, Presentation)
@@ -195,10 +213,15 @@ WantedBy=multi-user.target
 - Layout sin dock para mejor UX
 
 ### 📂 **File Management**
-- Explorador de archivos
-- Subida y descarga de archivos
-- Búsqueda avanzada
-- Vista de detalles con parámetros dinámicos
+- Explorador de archivos con vista unificada
+- Cards de archivos en 3 tamaños: small, medium, large  
+- Header integrado con breadcrumbs, buscador y controles
+- Breadcrumbs inteligentes con truncamiento automático (máx. 3 niveles)
+- Búsqueda en tiempo real de archivos y carpetas
+- Indicadores visuales para archivos compartidos y permisos
+- Vista responsive que se adapta automáticamente
+- Botones para subir archivos y crear carpetas
+- Sistema de navegación por carpetas con doble clic
 
 ### 📊 **Dashboard**
 - Panel principal con estadísticas
@@ -217,7 +240,9 @@ WantedBy=multi-user.target
 - **Tailwind CSS 4** para estilos
 - **Framer Motion** para animaciones
 - **Lucide React** para iconos
+- **Motion Primitives** para componentes animados
 - Enrutador personalizado
+- **TextShimmer** para efectos de texto dinámicos
 
 ### Backend
 - **Go** con Gin framework
@@ -226,6 +251,13 @@ WantedBy=multi-user.target
 - Manejo de archivos y metadatos
 
 ## 🎨 Sistema de Diseño
+
+### Componentes Principales
+- **SimpleTopBar**: Barra superior con breadcrumbs, reloj y menús
+- **FileExplorerHeader**: Header unificado para el explorador de archivos
+- **SimpleMusicPlayer**: Reproductor de música integrado
+- **FileCard**: Cards de archivos con 3 tamaños diferentes
+- **FilesGrid**: Grid responsivo para mostrar archivos y carpetas
 
 ### Layouts Disponibles
 - **Main**: Layout completo con dock para navegación
@@ -240,6 +272,8 @@ WantedBy=multi-user.target
 .futuristic-text         /* Texto principal */
 .futuristic-text-secondary /* Texto secundario */
 .futuristic-text-muted   /* Texto atenuado */
+.file-explorer-header    /* Fondo específico del explorador */
+.breadcrumb-item         /* Elementos de navegación */
 ```
 
 ## 📝 Contribución
