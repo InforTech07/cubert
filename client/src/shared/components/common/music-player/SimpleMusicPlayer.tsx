@@ -13,30 +13,27 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { TextEffect } from '../../ui/motion-primitives/text-effect';
 import { TextShimmer } from '../../ui/motion-primitives/text-shimmer-basic';
-
-
-interface SimpleTrack {
-  id: string;
-  title: string;
-  url: string;
-}
+import { useMusicPlayer, type MusicTrack } from '../../../contexts/MusicPlayerContext';
 
 interface SimpleMusicPlayerProps {
   className?: string;
 }
 
 const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' }) => {
-  const [currentTrack, setCurrentTrack] = useState<SimpleTrack | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playlist, setPlaylist] = useState<SimpleTrack[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [autoplay] = useState(true);
+  const {
+    currentTrack,
+    playlist,
+    isPlaying,
+    isLoading,
+    togglePlayPause,
+    nextTrack,
+    previousTrack,
+    selectTrack,
+    loadTracks
+  } = useMusicPlayer();
+
   const [showPlaylist, setShowPlaylist] = useState(false);
-  
-  const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cargar archivos
@@ -44,12 +41,12 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    const newTracks: SimpleTrack[] = [];
+    const newTracks: MusicTrack[] = [];
     
     Array.from(files).forEach((file, index) => {
       if (file.type.startsWith('audio/')) {
         const url = URL.createObjectURL(file);
-        const track: SimpleTrack = {
+        const track: MusicTrack = {
           id: `track_${Date.now()}_${index}`,
           title: file.name.replace(/\.[^/.]+$/, ''),
           url: url,
@@ -59,163 +56,17 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
     });
 
     if (newTracks.length > 0) {
-      setPlaylist(prev => {
-        const updated = [...prev, ...newTracks];
-        if (!currentTrack && updated.length > 0) {
-          setCurrentTrack(updated[0]);
-          setCurrentIndex(0);
-          
-          // Autoplay si está habilitado
-          if (autoplay) {
-            setTimeout(async () => {
-              const audio = audioRef.current;
-              if (audio) {
-                try {
-                  setIsLoading(true);
-                  await audio.play();
-                  setIsPlaying(true);
-                } catch (error) {
-                  if (error instanceof Error && error.name !== 'AbortError') {
-                    console.error('Error en autoplay inicial:', error);
-                  }
-                } finally {
-                  setIsLoading(false);
-                }
-              }
-            }, 100);
-          }
-        }
-        return updated;
-      });
+      loadTracks(newTracks);
     }
 
     // Limpiar input
     if (event.target) {
       event.target.value = '';
     }
-  }, [currentTrack]);
-
-  // Play/Pause simplificado
-  const togglePlayPause = useCallback(async () => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack) return;
-
-    try {
-      if (isPlaying) {
-        audio.pause();
-        setIsPlaying(false);
-      } else {
-        setIsLoading(true);
-        await audio.play();
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        console.error('Error reproduciendo:', error);
-      }
-      setIsPlaying(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isPlaying, currentTrack]);
-
-  // Siguiente canción con autoplay
-  const nextTrack = useCallback(async (shouldAutoplay = false) => {
-    if (playlist.length === 0) return;
-    
-    const nextIndex = (currentIndex + 1) % playlist.length;
-    setCurrentTrack(playlist[nextIndex]);
-    setCurrentIndex(nextIndex);
-    setIsPlaying(false);
-
-    // Si es autoplay o está habilitado el autoplay, reproducir automáticamente
-    if (shouldAutoplay || autoplay) {
-      // Esperar un poco para que el audio se configure
-      setTimeout(async () => {
-        const audio = audioRef.current;
-        if (audio && playlist[nextIndex]) {
-          try {
-            setIsLoading(true);
-            await audio.play();
-            setIsPlaying(true);
-          } catch (error) {
-            if (error instanceof Error && error.name !== 'AbortError') {
-              console.error('Error en autoplay:', error);
-            }
-          } finally {
-            setIsLoading(false);
-          }
-        }
-      }, 100);
-    }
-  }, [playlist, currentIndex, autoplay]);
-
-  // Canción anterior
-  const previousTrack = useCallback(() => {
-    if (playlist.length === 0) return;
-    
-    const prevIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
-    setCurrentTrack(playlist[prevIndex]);
-    setCurrentIndex(prevIndex);
-    setIsPlaying(false);
-  }, [playlist, currentIndex]);
-
-  // Seleccionar canción específica de la playlist
-  const selectTrack = useCallback(async (index: number) => {
-    if (playlist.length === 0 || index < 0 || index >= playlist.length) return;
-    
-    setCurrentTrack(playlist[index]);
-    setCurrentIndex(index);
-    setIsPlaying(false);
-    setShowPlaylist(false);
-
-    // Autoplay si está habilitado
-    if (autoplay) {
-      setTimeout(async () => {
-        const audio = audioRef.current;
-        if (audio) {
-          try {
-            setIsLoading(true);
-            await audio.play();
-            setIsPlaying(true);
-          } catch (error) {
-            if (error instanceof Error && error.name !== 'AbortError') {
-              console.error('Error en autoplay:', error);
-            }
-          } finally {
-            setIsLoading(false);
-          }
-        }
-      }, 100);
-    }
-  }, [playlist, autoplay]);
-
-  // Configurar volumen cuando cambie
-  React.useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    
-    // Mantener volumen fijo al 75%
-    audio.volume = 0.75;
-  }, []);
+  }, [loadTracks]);
 
   return (
     <div className={`flex items-center gap-2 relative z-10 ${className}`}>
-      {/* Audio element oculto */}
-      {currentTrack && (
-        <audio 
-          ref={audioRef} 
-          src={currentTrack.url}
-          onEnded={() => {
-            setIsPlaying(false);
-            // Pasar automáticamente a la siguiente canción si hay más en la playlist
-            if (playlist.length > 1) {
-              nextTrack(true); // true indica que es autoplay
-            }
-          }}
-        />
-      )}
-      
       {/* Input file oculto */}
       <input
         ref={fileInputRef}
@@ -279,7 +130,7 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => nextTrack(false)}
+              onClick={() => nextTrack()}
               className="p-1 rounded hover:bg-white/10 transition-colors"
               disabled={playlist.length <= 1}
             >
@@ -339,14 +190,17 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
                         <motion.button
                           key={track.id}
                           whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                          onClick={() => selectTrack(index)}
+                          onClick={() => {
+                            selectTrack(index);
+                            setShowPlaylist(false);
+                          }}
                           className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
-                            index === currentIndex 
+                            currentTrack?.id === track.id
                               ? 'futuristic-text bg-white/5 border-l-2 border-primary' 
                               : 'futuristic-text-secondary hover:futuristic-text'
                           }`}
                         >
-                          {index === currentIndex && isPlaying ? (
+                          {currentTrack?.id === track.id && isPlaying ? (
                             <Play className="w-4 h-4 flex-shrink-0 text-primary" />
                           ) : (
                             <Music className="w-4 h-4 flex-shrink-0" />

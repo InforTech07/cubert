@@ -1,9 +1,25 @@
 import React from 'react';
-import { Package, Activity, Component } from 'lucide-react';
 import { useSimpleDateTime, useSimpleLogout } from '../../../../shared/components/simple-topbar/SimpleTopBarHooks';
 
+// Componentes del dashboard
+import FavoriteFolders from '../components/FavoriteFolders/FavoriteFolders';
+import FavoriteFiles from '../components/FavoriteFiles/FavoriteFiles';
+import SystemStatistics from '../components/SystemStatistics/SystemStatistics';
+import RecentActivity from '../components/RecentActivity/RecentActivity';
+import QuickAccess from '../components/QuickAccess/QuickAccess';
+import MusicPlayerDashboard from '../components/MusicPlayer/MusicPlayerDashboard';
+
+// Datos mock
+import {
+  mockFavoriteFolders,
+  mockFavoriteFiles,
+  mockSystemStats,
+  mockRecentActivity,
+  mockQuickAccess
+} from '../../data/mockDashboardData';
+
 const HomePage: React.FC = () => {
-  // Activar herramientas del TopBar para el dashboard usando hooks simples
+  // Activar herramientas del TopBar para el dashboard
   useSimpleDateTime();
 
   useSimpleLogout(() => {
@@ -12,67 +28,70 @@ const HomePage: React.FC = () => {
     alert('¡Cerrando sesión!');
   });
 
+  // Handlers para interacciones
+  const handleFolderClick = (folder: any) => {
+    console.log('Navegando a carpeta:', folder.path);
+  };
+
+  const handleFileClick = (file: any) => {
+    console.log('Abriendo archivo:', file.path);
+  };
+
+  const handleActivityClick = (activity: any) => {
+    console.log('Detalle de actividad:', activity);
+  };
+
+  const handleQuickAccessClick = (item: any) => {
+    console.log('Acceso rápido a:', item.path);
+  };
+
   return (
     <div className="min-h-screen p-6">
-      {/* Header */}
-      <header className="mb-8">
-        <div className="futuristic-glass rounded-2xl p-6 futuristic-highlight">
-          <h1 className="text-4xl font-light futuristic-text mb-2 tracking-wide">
-            Cubert Dashboard
-          </h1>
-          <p className="futuristic-text-secondary text-lg font-light">
-            Sistema de archivos futurista
-          </p>
-        </div>
-      </header>
-
-      {/* Contenido principal */}
-      <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="futuristic-surface rounded-2xl p-6 futuristic-highlight">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 futuristic-glass rounded-xl flex items-center justify-center futuristic-highlight mr-4">
-              <Package className="w-6 h-6 futuristic-text" />
-            </div>
-            <div>
-              <h3 className="text-xl font-light futuristic-text">Archivos</h3>
-              <p className="futuristic-text-muted text-sm">Gestión de archivos</p>
-            </div>
+      {/* Bento Grid Layout */}
+      <div className="max-w-7xl mx-auto">
+        {/* Grid responsivo estilo bento */}
+        <div className="grid grid-cols-12 gap-6 auto-rows-fr">
+          
+          {/* Fila 1: Estadísticas del Sistema (más compacto) + Reproductor de Música */}
+          <div className="col-span-12 md:col-span-8">
+            <SystemStatistics stats={mockSystemStats} />
           </div>
-          <p className="futuristic-text-secondary">
-            Explora y gestiona todos tus archivos en un entorno futurista.
-          </p>
-        </div>
 
-        <div className="futuristic-surface rounded-2xl p-6 futuristic-highlight">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 futuristic-glass rounded-xl flex items-center justify-center futuristic-highlight mr-4">
-              <Activity className="w-6 h-6 futuristic-text" />
-            </div>
-            <div>
-              <h3 className="text-xl font-light futuristic-text">Actividad</h3>
-              <p className="futuristic-text-muted text-sm">Registro de acciones</p>
-            </div>
+          <div className="col-span-12 md:col-span-4">
+            <MusicPlayerDashboard />
           </div>
-          <p className="futuristic-text-secondary">
-            Monitorea la actividad reciente en tu sistema.
-          </p>
-        </div>
 
-        <div className="futuristic-surface rounded-2xl p-6 futuristic-highlight">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 futuristic-glass rounded-xl flex items-center justify-center futuristic-highlight mr-4">
-              <Component className="w-6 h-6 futuristic-text" />
-            </div>
-            <div>
-              <h3 className="text-xl font-light futuristic-text">Componentes</h3>
-              <p className="futuristic-text-muted text-sm">Elementos del sistema</p>
-            </div>
+          {/* Fila 2: Carpetas favoritas + Archivos favoritos */}
+          <div className="col-span-12 md:col-span-6">
+            <FavoriteFolders 
+              folders={mockFavoriteFolders} 
+              onFolderClick={handleFolderClick}
+            />
           </div>
-          <p className="futuristic-text-secondary">
-            Accede a los componentes principales del sistema.
-          </p>
+          
+          <div className="col-span-12 md:col-span-6">
+            <FavoriteFiles 
+              files={mockFavoriteFiles} 
+              onFileClick={handleFileClick}
+            />
+          </div>
+
+          {/* Fila 3: Actividad reciente + Accesos rápidos */}
+          <div className="col-span-12 md:col-span-8">
+            <RecentActivity 
+              activities={mockRecentActivity}
+              onActivityClick={handleActivityClick}
+            />
+          </div>
+
+          <div className="col-span-12 md:col-span-4">
+            <QuickAccess 
+              items={mockQuickAccess}
+              onItemClick={handleQuickAccessClick}
+            />
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
