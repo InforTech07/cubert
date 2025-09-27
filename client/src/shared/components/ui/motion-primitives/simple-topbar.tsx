@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import SimpleMusicPlayer from '../../common/music-player/SimpleMusicPlayer';
 
 // Types simplificados
 export type SimpleTopBarSection = {
@@ -58,13 +59,11 @@ export function useSimpleTopBar() {
   return context;
 }
 
-// TopBar component simplificado
+// TopBar component simplificado con reproductor de música fijo
 export function SimpleTopBar() {
   const { sections } = useSimpleTopBar();
 
-  if (sections.length === 0) return null;
-
-  // Organizar sections por posición
+  // Organizar sections por posición (sin incluir el reproductor que va fijo)
   const leftSections = sections.filter(s => s.position === 'left');
   const centerSections = sections.filter(s => s.position === 'center');
   const rightSections = sections.filter(s => s.position === 'right');
@@ -80,7 +79,7 @@ export function SimpleTopBar() {
           backdropFilter: 'blur(12px)',
         }}
       >
-        {/* Left */}
+        {/* Left - Solo secciones dinámicas */}
         <div className="flex items-center gap-4 flex-1">
           {leftSections.map((section) => (
             <div key={section.id}>{section.component}</div>
@@ -94,11 +93,20 @@ export function SimpleTopBar() {
           ))}
         </div>
 
-        {/* Right */}
+        {/* Right - Reproductor de música FIJO + secciones dinámicas */}
         <div className="flex items-center gap-4 flex-1 justify-end">
+          {/* Secciones dinámicas del lado derecho primero */}
           {rightSections.map((section) => (
             <div key={section.id}>{section.component}</div>
           ))}
+          
+          {/* Separador si hay secciones adicionales */}
+          {rightSections.length > 0 && (
+            <div className="w-px h-6 bg-white/20 mx-2" />
+          )}
+          
+          {/* Reproductor de música siempre fijo al final (lado derecho) */}
+          <SimpleMusicPlayer className="max-w-sm" />
         </div>
       </div>
     </div>

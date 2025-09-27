@@ -42,9 +42,9 @@ export function useSimpleLogout(onLogout?: () => void) {
   const logoutComponent = (
     <button
       onClick={onLogout || (() => alert('Logout!'))}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/20 hover:text-red-300 transition-colors duration-200"
+      className="flex items-center gap-2 px-3 py-2 rounded-lg futuristic-text transition-colors duration-200 hover:bg-red-500/20 hover:text-red-300"
     >
-      <LogOut className="w-4 h-4" />
+      <LogOut className="w-4 h-4 futuristic-text-secondary" />
       <span className="text-sm">Logout</span>
     </button>
   );

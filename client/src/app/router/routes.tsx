@@ -3,7 +3,6 @@ import type { RouteConfig } from './types';
 
 // Importar páginas
 import HomePage from '../../modules/dashboard/presentation/pages/HomePage';
-import DashboardWithTopBar from '../../modules/dashboard/presentation/pages/DashboardWithTopBar';
 import LoginPage from '../../modules/auth/presentation/pages/LoginPage';
 import FileDetailPage from '../../modules/file-management/presentation/pages/FileDetailPage';
 
@@ -51,12 +50,12 @@ export const routes: RouteConfig[] = [
   // Ejemplo de rutas anidadas
   {
     path: '/dashboard',
-    component: DashboardWithTopBar, // Usar la nueva página con TopBar
+    component: HomePage, // Usar HomePage normal
     layout: 'main',
     children: [
       {
         path: '/dashboard/analytics',
-        component: DashboardWithTopBar, // También aquí
+        component: HomePage, // Usar HomePage normal
         layout: 'main',
         title: 'Cubert - Analytics'
       },

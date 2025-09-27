@@ -4,6 +4,7 @@ import {
   Component,
   HomeIcon,
   Mail,
+  Music,
   Package,
   ScrollText,
   SunMoon,
@@ -25,6 +26,13 @@ const dockData = [
       <Package className='h-full w-full futuristic-text transition-colors duration-300 hover:text-white' />
     ),
     href: '/files',
+  },
+  {
+    title: 'Music',
+    icon: (
+      <Music className='h-full w-full futuristic-text transition-colors duration-300 hover:text-white' />
+    ),
+    href: '/music',
   },
   {
     title: 'Components',
