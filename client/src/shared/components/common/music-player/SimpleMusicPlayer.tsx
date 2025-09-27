@@ -200,7 +200,7 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
   }, []);
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 relative z-10 ${className}`}>
       {/* Audio element oculto */}
       {currentTrack && (
         <audio 
@@ -240,7 +240,7 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
       ) : (
         <div className="flex items-center gap-3">
           {/* Nombre de la canción - IZQUIERDA */}
-          <div className="flex flex-col min-w-0 max-w-32">
+          <div className="flex flex-col min-w-0 max-w-48">
             <div className="text-xs futuristic-text truncate" title={currentTrack.title}>
                 <TextShimmer className='font-mono text-sm' duration={5}>
                     {currentTrack.title}
@@ -288,7 +288,7 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
           </div>
 
           {/* Menú de Playlist - DERECHA */}
-          <div className="relative">
+          <div className="relative z-20">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -304,7 +304,7 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
                 <>
                   {/* Backdrop */}
                   <div 
-                    className="fixed inset-0 z-10" 
+                    className="fixed inset-0 z-40" 
                     onClick={() => setShowPlaylist(false)} 
                   />
                   
@@ -314,7 +314,11 @@ const SimpleMusicPlayer: React.FC<SimpleMusicPlayerProps> = ({ className = '' })
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-12 z-20 w-64 max-h-80 overflow-y-auto futuristic-surface rounded-xl border border-white/20 shadow-2xl backdrop-blur-sm"
+                    className="absolute right-0 top-12 z-50 w-64 max-h-80 overflow-y-auto rounded-xl border border-white/20 shadow-2xl backdrop-blur-lg"
+                    style={{
+                      background: 'rgba(15, 20, 30, 0.95)',
+                      backdropFilter: 'blur(16px)',
+                    }}
                   >
                     {/* Opción de cargar pistas */}
                     <motion.button

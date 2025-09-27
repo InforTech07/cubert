@@ -1,22 +1,10 @@
-import React from 'react';
 import type { RouteConfig } from './types';
 
 // Importar páginas
 import HomePage from '../../modules/dashboard/presentation/pages/HomePage';
 import LoginPage from '../../modules/auth/presentation/pages/LoginPage';
+import FilesPage from '../../modules/file-management/presentation/pages/FilesPage';
 import FileDetailPage from '../../modules/file-management/presentation/pages/FileDetailPage';
-
-// Placeholder para FilesPage (lo crearemos después)
-const FilesPage: React.FC = () => {
-  return (
-    <div className="min-h-screen p-6">
-      <div className="futuristic-surface rounded-2xl p-8 text-center futuristic-highlight">
-        <h1 className="text-2xl font-light futuristic-text mb-4">Página de Archivos</h1>
-        <p className="futuristic-text-secondary">Próximamente...</p>
-      </div>
-    </div>
-  );
-};
 
 // Configuración de rutas
 export const routes: RouteConfig[] = [

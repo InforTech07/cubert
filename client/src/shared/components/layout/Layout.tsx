@@ -103,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Contenido principal */}
-        <div className="relative z-10 min-h-screen flex flex-col" style={{ paddingTop: '80px', paddingBottom: '120px' }}>
+        <div className="relative z-5 min-h-screen flex flex-col" style={{ paddingBottom: '120px' }}>
           {/* Área de contenido - aquí se renderizará el children */}
           <main className="flex-1 w-full">
             {children}

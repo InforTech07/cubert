@@ -110,7 +110,7 @@ const UserMenu: React.FC = () => {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative z-10">
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -126,7 +126,7 @@ const UserMenu: React.FC = () => {
           <>
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 z-10" 
+              className="fixed inset-0 z-40" 
               onClick={() => setIsOpen(false)} 
             />
             
@@ -136,7 +136,11 @@ const UserMenu: React.FC = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-12 z-20 w-48 py-2 futuristic-surface rounded-xl border border-white/20 shadow-2xl backdrop-blur-sm"
+              className="absolute right-0 top-12 z-50 w-48 py-2 rounded-xl border border-white/20 shadow-2xl backdrop-blur-lg"
+              style={{
+                background: 'rgba(15, 20, 30, 0.95)',
+                backdropFilter: 'blur(16px)',
+              }}
             >
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
@@ -168,13 +172,12 @@ const UserMenu: React.FC = () => {
 // TopBar Principal con elementos fijos
 export function SimpleTopBar() {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 p-4">
+    <div className="w-full p-4 relative z-30">
       <div
         className="mx-auto flex items-center justify-between w-full max-w-screen-2xl rounded-2xl px-6 py-3"
         style={{
           height: 60,
-          background: 'var(--futuristic-glass)',
-          border: '1px solid var(--futuristic-glass-border)',
+          background: 'rgba(0, 0, 0, 0.2)',
           backdropFilter: 'blur(12px)',
         }}
       >
