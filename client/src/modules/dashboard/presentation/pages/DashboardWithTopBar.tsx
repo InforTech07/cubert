@@ -1,30 +1,68 @@
 import React from 'react';
+import { useSimpleDateTime, useSimpleLogout, useSimpleBreadcrumb } from '../../../../shared/components/simple-topbar/SimpleTopBarHooks';
 import { Package, Activity, Component } from 'lucide-react';
-import { useSimpleDateTime, useSimpleLogout } from '../../../../shared/components/simple-topbar/SimpleTopBarHooks';
 
-const HomePage: React.FC = () => {
-  // Activar herramientas del TopBar para el dashboard usando hooks simples
+const DashboardWithTopBar: React.FC = () => {
+  // Activar herramientas del TopBar usando hooks simples
   useSimpleDateTime();
-
+  
   useSimpleLogout(() => {
     console.log('Cerrando sesión desde el dashboard');
-    // Aquí puedes agregar la lógica de logout
-    alert('¡Cerrando sesión!');
+    alert('¡Funciona! Cerrando sesión...');
   });
+
+  useSimpleBreadcrumb([
+    { label: 'Dashboard', path: '/' },
+    { label: 'Analytics', path: '/dashboard/analytics' },
+  ]);
 
   return (
     <div className="min-h-screen p-6">
+      {/* Mensaje de confirmación */}
+      <div className="futuristic-glass rounded-2xl p-4 mb-8 text-center">
+        <p className="futuristic-text">
+          🎉 ¡TopBar activado! Mira la parte superior de la pantalla
+        </p>
+      </div>
+
       {/* Header */}
       <header className="mb-8">
         <div className="futuristic-glass rounded-2xl p-6 futuristic-highlight">
           <h1 className="text-4xl font-light futuristic-text mb-2 tracking-wide">
-            Cubert Dashboard
+            Cubert Dashboard con TopBar
           </h1>
           <p className="futuristic-text-secondary text-lg font-light">
-            Sistema de archivos futurista
+            Sistema de archivos futurista con TopBar dinámico
           </p>
         </div>
       </header>
+
+      {/* Información del TopBar */}
+      <div className="futuristic-surface rounded-2xl p-6 mb-8">
+        <h2 className="text-2xl font-semibold futuristic-text mb-4">
+          Herramientas Activas en el TopBar
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="futuristic-glass rounded-lg p-4">
+            <h3 className="futuristic-text font-medium mb-2">📅 Fecha y Hora</h3>
+            <p className="futuristic-text-secondary text-sm">
+              Se actualiza en tiempo real en el centro del TopBar
+            </p>
+          </div>
+          <div className="futuristic-glass rounded-lg p-4">
+            <h3 className="futuristic-text font-medium mb-2">🏠 Breadcrumb</h3>
+            <p className="futuristic-text-secondary text-sm">
+              Navegación de rutas en la izquierda del TopBar
+            </p>
+          </div>
+          <div className="futuristic-glass rounded-lg p-4">
+            <h3 className="futuristic-text font-medium mb-2">🚪 Logout</h3>
+            <p className="futuristic-text-secondary text-sm">
+              Botón de cierre de sesión en la derecha del TopBar
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Contenido principal */}
       <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -77,4 +115,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default DashboardWithTopBar;

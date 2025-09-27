@@ -3,6 +3,7 @@ import type { RouteConfig } from './types';
 
 // Importar páginas
 import HomePage from '../../modules/dashboard/presentation/pages/HomePage';
+import DashboardWithTopBar from '../../modules/dashboard/presentation/pages/DashboardWithTopBar';
 import LoginPage from '../../modules/auth/presentation/pages/LoginPage';
 import FileDetailPage from '../../modules/file-management/presentation/pages/FileDetailPage';
 
@@ -22,7 +23,7 @@ const FilesPage: React.FC = () => {
 export const routes: RouteConfig[] = [
   {
     path: '/',
-    component: HomePage,
+    component: HomePage, // Usar HomePage normal
     layout: 'main',
     exact: true,
     title: 'Cubert - Dashboard'
@@ -50,19 +51,19 @@ export const routes: RouteConfig[] = [
   // Ejemplo de rutas anidadas
   {
     path: '/dashboard',
-    component: HomePage,
+    component: DashboardWithTopBar, // Usar la nueva página con TopBar
     layout: 'main',
     children: [
       {
         path: '/dashboard/analytics',
-        component: HomePage, // Puedes crear un componente específico
+        component: DashboardWithTopBar, // También aquí
         layout: 'main',
         title: 'Cubert - Analytics'
       },
       {
         path: '/dashboard/settings',
-        component: HomePage, // Puedes crear un componente específico
-        layout: 'simple', // Ejemplo usando layout simple
+        component: HomePage, // Ahora también usa main layout
+        layout: 'main', // Cambiado de 'simple' a 'main'
         title: 'Cubert - Configuración'
       }
     ]

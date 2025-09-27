@@ -11,16 +11,16 @@ interface LayoutWrapperProps {
 const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children, layout = 'main' }) => {
   switch (layout) {
     case 'main':
-      return <Layout showDock={true}>{children}</Layout>;
+      return <Layout>{children}</Layout>;
     
     case 'simple':
       return <SimpleLayout>{children}</SimpleLayout>;
     
     case 'auth':
-      return <Layout showDock={false}>{children}</Layout>;
+      return <SimpleLayout>{children}</SimpleLayout>; // auth ahora usa SimpleLayout
     
     default:
-      return <Layout showDock={true}>{children}</Layout>;
+      return <Layout>{children}</Layout>; // por defecto usa main layout
   }
 };
 
