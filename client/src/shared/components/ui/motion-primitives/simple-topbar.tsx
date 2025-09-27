@@ -104,7 +104,7 @@ const UserMenu: React.FC = () => {
     { 
       icon: LogOut, 
       label: 'Cerrar Sesión', 
-      onClick: () => console.log('Cerrar sesión'),
+      onClick: () => window.location.href = '/login',
       className: 'text-red-400 hover:text-red-300'
     },
   ];
