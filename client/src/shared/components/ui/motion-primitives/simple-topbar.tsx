@@ -1,73 +1,172 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+import { useRouter } from '../../../../app/router/Router';
 import SimpleMusicPlayer from '../../common/music-player/SimpleMusicPlayer';
 
-// Types simplificados
-export type SimpleTopBarSection = {
-  id: string;
-  component: React.ReactNode;
-  position: 'left' | 'center' | 'right';
-  priority: number;
-};
+// Componente de Breadcrumbs
+const Breadcrumbs: React.FC = () => {
+  const { currentPath } = useRouter();
 
-export type SimpleTopBarContextType = {
-  sections: SimpleTopBarSection[];
-  addSection: (section: SimpleTopBarSection) => void;
-  removeSection: (id: string) => void;
-};
+  const getBreadcrumbs = (pathname: string) => {
+    const segments = pathname.split('/').filter(Boolean);
+    const breadcrumbs = [{ label: 'Inicio', path: '/' }];
 
-// Context simplificado
-const SimpleTopBarContext = createContext<SimpleTopBarContextType | undefined>(undefined);
-
-// Provider simplificado
-export function SimpleTopBarProvider({ children }: { children: React.ReactNode }) {
-  const [sections, setSections] = useState<SimpleTopBarSection[]>([]);
-
-  const addSection = useCallback((section: SimpleTopBarSection) => {
-    setSections((prev) => {
-      // Remover section existente con el mismo id
-      const filtered = prev.filter(s => s.id !== section.id);
-      // Agregar nueva section y ordenar por prioridad
-      return [...filtered, section].sort((a, b) => a.priority - b.priority);
+    let currentPath = '';
+    segments.forEach((segment) => {
+      currentPath += `/${segment}`;
+      const label = segment.charAt(0).toUpperCase() + segment.slice(1);
+      breadcrumbs.push({ label, path: currentPath });
     });
-  }, []);
 
-  const removeSection = useCallback((id: string) => {
-    setSections(prev => prev.filter(s => s.id !== id));
-  }, []);
+    return breadcrumbs;
+  };
 
-  const value = useMemo(() => ({
-    sections,
-    addSection,
-    removeSection,
-  }), [sections, addSection, removeSection]);
+  const breadcrumbs = getBreadcrumbs(currentPath);
 
   return (
-    <SimpleTopBarContext.Provider value={value}>
-      {children}
-    </SimpleTopBarContext.Provider>
+    <nav className="flex items-center gap-2 text-sm">
+      {breadcrumbs.map((breadcrumb, index) => (
+        <React.Fragment key={breadcrumb.path}>
+          {index > 0 && <span className="futuristic-text-secondary">/</span>}
+          <motion.span
+            whileHover={{ scale: 1.05 }}
+            className={`cursor-pointer transition-colors ${
+              index === breadcrumbs.length - 1
+                ? 'futuristic-text font-medium'
+                : 'futuristic-text-secondary hover:futuristic-text'
+            }`}
+          >
+            {breadcrumb.label}
+          </motion.span>
+        </React.Fragment>
+      ))}
+    </nav>
   );
-}
+};
 
-// Hook simplificado
-export function useSimpleTopBar() {
-  const context = useContext(SimpleTopBarContext);
-  if (!context) {
-    throw new Error('useSimpleTopBar must be used within a SimpleTopBarProvider');
-  }
-  return context;
-}
+// Componente de Fecha y Hora
+const DateTime: React.FC = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-// TopBar component simplificado con reproductor de música fijo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+    });
+  };
+
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div className="text-lg font-mono futuristic-text">
+        {formatTime(currentTime)}
+      </div>
+      <div className="text-xs futuristic-text-secondary">
+        {formatDate(currentTime)}
+      </div>
+    </div>
+  );
+};
+
+// Componente del Menú Desplegable
+const UserMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const menuItems = [
+    { 
+      icon: User, 
+      label: 'Perfil', 
+      onClick: () => console.log('Ir a perfil') 
+    },
+    { 
+      icon: Settings, 
+      label: 'Configuración', 
+      onClick: () => console.log('Ir a configuración') 
+    },
+    { 
+      icon: LogOut, 
+      label: 'Cerrar Sesión', 
+      onClick: () => console.log('Cerrar sesión'),
+      className: 'text-red-400 hover:text-red-300'
+    },
+  ];
+
+  return (
+    <div className="relative">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg futuristic-glass futuristic-highlight hover:bg-white/10 transition-colors"
+      >
+        <User className="w-4 h-4 futuristic-text" />
+        <ChevronDown className={`w-4 h-4 futuristic-text transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-10" 
+              onClick={() => setIsOpen(false)} 
+            />
+            
+            {/* Menu */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 top-12 z-20 w-48 py-2 futuristic-surface rounded-xl border border-white/20 shadow-2xl backdrop-blur-sm"
+            >
+              {menuItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.button
+                    key={index}
+                    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                    onClick={() => {
+                      item.onClick();
+                      setIsOpen(false);
+                    }}
+                    className={`flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors ${
+                      item.className || 'futuristic-text hover:futuristic-text-secondary'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// TopBar Principal con elementos fijos
 export function SimpleTopBar() {
-  const { sections } = useSimpleTopBar();
-
-  // Organizar sections por posición (sin incluir el reproductor que va fijo)
-  const leftSections = sections.filter(s => s.position === 'left');
-  const centerSections = sections.filter(s => s.position === 'center');
-  const rightSections = sections.filter(s => s.position === 'right');
-
   return (
     <div className="fixed top-0 left-0 right-0 z-50 p-4">
       <div
@@ -79,57 +178,45 @@ export function SimpleTopBar() {
           backdropFilter: 'blur(12px)',
         }}
       >
-        {/* Left - Solo secciones dinámicas */}
-        <div className="flex items-center gap-4 flex-1">
-          {leftSections.map((section) => (
-            <div key={section.id}>{section.component}</div>
-          ))}
+        {/* Izquierda - Breadcrumbs */}
+        <div className="flex items-center flex-1">
+          <Breadcrumbs />
         </div>
 
-        {/* Center */}
-        <div className="flex items-center gap-4">
-          {centerSections.map((section) => (
-            <div key={section.id}>{section.component}</div>
-          ))}
+        {/* Centro - Fecha y Hora */}
+        <div className="flex items-center justify-center">
+          <DateTime />
         </div>
 
-        {/* Right - Reproductor de música FIJO + secciones dinámicas */}
+        {/* Derecha - Reproductor de Música + Menú de Usuario */}
         <div className="flex items-center gap-4 flex-1 justify-end">
-          {/* Secciones dinámicas del lado derecho primero */}
-          {rightSections.map((section) => (
-            <div key={section.id}>{section.component}</div>
-          ))}
-          
-          {/* Separador si hay secciones adicionales */}
-          {rightSections.length > 0 && (
-            <div className="w-px h-6 bg-white/20 mx-2" />
-          )}
-          
-          {/* Reproductor de música siempre fijo al final (lado derecho) */}
           <SimpleMusicPlayer className="max-w-sm" />
+          
+          {/* Separador */}
+          <div className="w-px h-6 bg-white/20" />
+          
+          <UserMenu />
         </div>
       </div>
     </div>
   );
 }
 
-// Hook de uso simplificado
-export function useSimpleTopBarSection(
-  id: string,
-  component: React.ReactNode,
-  position: 'left' | 'center' | 'right',
-  priority: number = 1
-) {
-  const { addSection, removeSection } = useSimpleTopBar();
+// Provider simplificado (ya no necesario pero mantenemos compatibilidad)
+export function SimpleTopBarProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
 
-  // Usar useCallback para evitar recrear la función en cada render
-  const stableAddSection = useCallback(() => {
-    addSection({ id, component, position, priority });
-  }, [id, position, priority, addSection]);
+// Hook simplificado (mantenemos para compatibilidad)
+export function useSimpleTopBar() {
+  return {
+    sections: [],
+    addSection: () => {},
+    removeSection: () => {},
+  };
+}
 
-  // Agregar section al montar, remover al desmontar
-  useEffect(() => {
-    stableAddSection();
-    return () => removeSection(id);
-  }, [stableAddSection, removeSection, id]);
+// Hook simplificado (mantenemos para compatibilidad)
+export function useSimpleTopBarSection() {
+  // No hace nada ya que ahora es estático
 }
