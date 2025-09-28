@@ -2,50 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
-import { useRouter } from '../../../../app/router/Router';
+import { ChevronDown, LogOut, Settings, User, Menu } from 'lucide-react';
 import SimpleMusicPlayer from '../../common/music-player/SimpleMusicPlayer';
-
-// Componente de Breadcrumbs
-const Breadcrumbs: React.FC = () => {
-  const { currentPath } = useRouter();
-
-  const getBreadcrumbs = (pathname: string) => {
-    const segments = pathname.split('/').filter(Boolean);
-    const breadcrumbs = [{ label: 'Inicio', path: '/' }];
-
-    let currentPath = '';
-    segments.forEach((segment) => {
-      currentPath += `/${segment}`;
-      const label = segment.charAt(0).toUpperCase() + segment.slice(1);
-      breadcrumbs.push({ label, path: currentPath });
-    });
-
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = getBreadcrumbs(currentPath);
-
-  return (
-    <nav className="flex items-center gap-2 text-sm">
-      {breadcrumbs.map((breadcrumb, index) => (
-        <React.Fragment key={breadcrumb.path}>
-          {index > 0 && <span className="futuristic-text-secondary">/</span>}
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className={`cursor-pointer transition-colors ${
-              index === breadcrumbs.length - 1
-                ? 'futuristic-text font-medium'
-                : 'futuristic-text-secondary hover:futuristic-text'
-            }`}
-          >
-            {breadcrumb.label}
-          </motion.span>
-        </React.Fragment>
-      ))}
-    </nav>
-  );
-};
 
 // Componente de Fecha y Hora
 const DateTime: React.FC = () => {
@@ -117,7 +75,7 @@ const UserMenu: React.FC = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg futuristic-glass futuristic-highlight hover:bg-white/10 transition-colors"
       >
-        <User className="w-4 h-4 futuristic-text" />
+        <Menu className="w-4 h-4 futuristic-text" />
         <ChevronDown className={`w-4 h-4 futuristic-text transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </motion.button>
 
@@ -136,7 +94,7 @@ const UserMenu: React.FC = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-12 z-50 w-48 py-2 rounded-xl border border-white/20 shadow-2xl backdrop-blur-lg"
+              className="absolute left-0 top-12 z-50 w-48 py-2 rounded-xl border border-white/20 shadow-2xl backdrop-blur-lg"
               style={{
                 background: 'rgba(15, 20, 30, 0.95)',
                 backdropFilter: 'blur(16px)',
@@ -181,9 +139,9 @@ export function SimpleTopBar() {
           backdropFilter: 'blur(12px)',
         }}
       >
-        {/* Izquierda - Breadcrumbs */}
+        {/* Izquierda - Menú de Usuario */}
         <div className="flex items-center flex-1">
-          <Breadcrumbs />
+          <UserMenu />
         </div>
 
         {/* Centro - Fecha y Hora */}
@@ -191,14 +149,9 @@ export function SimpleTopBar() {
           <DateTime />
         </div>
 
-        {/* Derecha - Reproductor de Música + Menú de Usuario */}
+        {/* Derecha - Reproductor de Música (solo cuando está reproduciendo) */}
         <div className="flex items-center gap-4 flex-1 justify-end">
           <SimpleMusicPlayer className="max-w-sm" />
-          
-          {/* Separador */}
-          <div className="w-px h-6 bg-white/20" />
-          
-          <UserMenu />
         </div>
       </div>
     </div>

@@ -221,6 +221,207 @@
   border-radius: 4px;
 }
 
+/* === TRANSICIONES DE RUTAS === */
+
+/* Contenedor principal de transiciones */
+.route-transition-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Efectos de desenfoque suaves para transiciones */
+.transition-blur-enter {
+  filter: blur(8px);
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.transition-blur-exit {
+  filter: blur(8px);
+  opacity: 0;
+  transform: scale(1.02);
+}
+
+/* Efectos de profundidad para transiciones tipo matrix */
+.route-matrix-perspective {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Animación de partículas sutiles para transiciones */
+@keyframes particle-float {
+  0%, 100% { 
+    opacity: 0.1;
+    transform: translateY(0px) translateX(0px);
+  }
+  33% {
+    opacity: 0.3;
+    transform: translateY(-10px) translateX(5px);
+  }
+  66% {
+    opacity: 0.2;
+    transform: translateY(-5px) translateX(-3px);
+  }
+}
+
+.route-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.route-particles::before,
+.route-particles::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--futuristic-accent);
+  border-radius: 50%;
+  animation: particle-float 6s ease-in-out infinite;
+}
+
+.route-particles::before {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.route-particles::after {
+  top: 60%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+/* Efectos de cristal para transiciones */
+.transition-glass-effect {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Animaciones de entrada suaves */
+@keyframes route-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes route-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes route-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Clases utilitarias para transiciones */
+.transition-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.transition-backface-hidden {
+  backface-visibility: hidden;
+}
+
+.transition-gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity, filter;
+}
+
+/* Efecto de ondas para transiciones */
+@keyframes ripple-effect {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.route-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(100, 120, 150, 0.2);
+  animation: ripple-effect 0.6s linear;
+  pointer-events: none;
+}
+
+/* Optimizaciones de rendimiento */
+.route-transition-container * {
+  transform: translateZ(0);
+}
+
+/* Smooth scrolling durante transiciones */
+.route-transition-active {
+  overflow: hidden;
+}
+
+.route-transition-active body {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* Efecto de brillo sutil en bordes durante transición */
+@keyframes transition-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(100, 120, 150, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(100, 120, 150, 0.6);
+  }
+}
+
+.route-glow-border {
+  animation: transition-glow 2s ease-in-out infinite;
+}
+
+/* Transición para elementos que aparecen con stagger */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: route-slide-up 0.6s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
 /* Mejoras responsive específicas */
 @media (max-width: 640px) {
   .file-card-small {

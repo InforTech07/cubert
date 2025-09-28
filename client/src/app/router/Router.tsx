@@ -1,12 +1,16 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import type { RouteConfig } from './types';
+import type { TransitionConfig } from './RouteTransition';
 import LayoutWrapper from './LayoutWrapper';
+import RouteTransition from './RouteTransition';
 
 // Context para el router
 interface RouterContextType {
   currentPath: string;
   navigate: (path: string) => void;
   params: Record<string, string>;
+  transitionConfig?: TransitionConfig;
+  setTransitionConfig: (config: TransitionConfig) => void;
 }
 
 const RouterContext = createContext<RouterContextType | undefined>(undefined);
@@ -30,6 +34,25 @@ export const useNavigate = () => {
 export const useParams = () => {
   const { params } = useRouter();
   return params;
+};
+
+// Hook para controlar transiciones
+export const useRouteTransition = () => {
+  const { transitionConfig, setTransitionConfig } = useRouter();
+  
+  const setTransition = (config: TransitionConfig) => {
+    setTransitionConfig(config);
+  };
+  
+  const resetTransition = () => {
+    setTransitionConfig({ type: 'matrix', duration: 0.4, direction: 'up' });
+  };
+  
+  return {
+    currentTransition: transitionConfig,
+    setTransition,
+    resetTransition
+  };
 };
 
 // Función para extraer parámetros de la ruta
@@ -89,11 +112,15 @@ const findMatchingRoute = (routes: RouteConfig[], currentPath: string): RouteCon
 
 interface RouterProps {
   routes: RouteConfig[];
+  defaultTransition?: TransitionConfig;
 }
 
-const Router: React.FC<RouterProps> = ({ routes }) => {
+const Router: React.FC<RouterProps> = ({ routes, defaultTransition }) => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [params, setParams] = useState<Record<string, string>>({});
+  const [transitionConfig, setTransitionConfig] = useState<TransitionConfig | undefined>(
+    defaultTransition || { type: 'matrix', duration: 0.4, direction: 'up' }
+  );
 
   useEffect(() => {
     const handlePopState = () => {
@@ -128,22 +155,34 @@ const Router: React.FC<RouterProps> = ({ routes }) => {
     currentPath,
     navigate,
     params,
+    transitionConfig,
+    setTransitionConfig,
   };
 
   return (
     <RouterContext.Provider value={routerValue}>
       {matchedRoute ? (
         <LayoutWrapper layout={matchedRoute.layout}>
-          <matchedRoute.component />
+          <RouteTransition 
+            routeKey={currentPath} 
+            transition={transitionConfig}
+          >
+            <matchedRoute.component />
+          </RouteTransition>
         </LayoutWrapper>
       ) : (
         <LayoutWrapper layout="main">
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="futuristic-surface rounded-3xl p-8 text-center futuristic-highlight">
-              <h1 className="text-2xl font-light futuristic-text mb-4">404</h1>
-              <p className="futuristic-text-secondary">Página no encontrada</p>
+          <RouteTransition 
+            routeKey="404" 
+            transition={transitionConfig}
+          >
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="futuristic-surface rounded-3xl p-8 text-center futuristic-highlight">
+                <h1 className="text-2xl font-light futuristic-text mb-4">404</h1>
+                <p className="futuristic-text-secondary">Página no encontrada</p>
+              </div>
             </div>
-          </div>
+          </RouteTransition>
         </LayoutWrapper>
       )}
     </RouterContext.Provider>
